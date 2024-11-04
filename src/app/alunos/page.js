@@ -38,6 +38,7 @@ export default function AlunosPage() {
             <th>Endereço</th>
             <th>Email</th>
             <th>Matrícula</th>
+            <th>Pagamento</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -51,6 +52,7 @@ export default function AlunosPage() {
               <td>{aluno.endereco}</td>
               <td>{aluno.email}</td>
               <td>{aluno.matricula}</td>
+              <td>{aluno.pagamento}</td>
               <td className="text-center">
                 <Button className="me-2" href={`/alunos/form?id=${aluno.id}`} variant="warning">
                   <FaPen />
