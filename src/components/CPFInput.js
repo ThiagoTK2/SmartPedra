@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 
 function formatCPF(value) {
@@ -37,9 +39,10 @@ export default function CPFInput() {
   const [isValid, setIsValid] = useState(true);
 
   const handleCPFChange = (e) => {
-    const formattedCPF = formatCPF(e.target.value);
+    const rawCPF = e.target.value.replace(/\D/g, ''); // CPF sem formatação
+    const formattedCPF = formatCPF(rawCPF); // Formata o CPF
     setCpf(formattedCPF);
-    setIsValid(validateCPF(formattedCPF));
+    setIsValid(validateCPF(rawCPF)); // Valida o CPF sem formatação
   };
 
   return (
@@ -53,8 +56,7 @@ export default function CPFInput() {
         maxLength="14"
         style={{ backgroundColor: 'white', color: 'black' }} // Garantindo o fundo branco
         className="form-control" // Classe padrão do Bootstrap
-    />
-
+      />
       {!isValid && <p style={{ color: 'red' }}>CPF inválido</p>}
     </div>
   );

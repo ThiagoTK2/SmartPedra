@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import Pagina from '@/components/Pagina'
-import { useEffect, useState } from 'react'
-import { Button, Table } from 'react-bootstrap'
-import { FaPen, FaPlusCircle, FaTrash } from 'react-icons/fa'
+import Pagina from '@/components/Pagina';
+import { useEffect, useState } from 'react';
+import { Button, Table } from 'react-bootstrap';
+import { FaPen, FaPlusCircle, FaTrash } from 'react-icons/fa';
 
 export default function ProfessoresPage() {
-  const [professores, setProfessores] = useState([])
+  const [professores, setProfessores] = useState([]);
 
   useEffect(() => {
-    const professoresLocalStorage = JSON.parse(localStorage.getItem("professores")) || []
-    setProfessores(professoresLocalStorage)
-  }, [])
+    const professoresLocalStorage = JSON.parse(localStorage.getItem("professores")) || [];
+    setProfessores(professoresLocalStorage);
+  }, []);
 
   function excluir(professor) {
-    if (window.confirm(`Deseja realmente excluir o professor ${professor.nome}?`)) {
-      const novaLista = professores.filter(item => item.id !== professor.id)
-      localStorage.setItem('professores', JSON.stringify(novaLista))
-      setProfessores(novaLista)
-      alert("Professor excluído com sucesso!")
+    if (window.confirm(`Deseja realmente excluir o professor ${professor.nomeCompleto}?`)) {
+      const novaLista = professores.filter(item => item.id !== professor.id);
+      localStorage.setItem('professores', JSON.stringify(novaLista));
+      setProfessores(novaLista);
+      alert("Professor excluído com sucesso!");
     }
   }
 
@@ -45,7 +45,7 @@ export default function ProfessoresPage() {
         <tbody>
           {professores.map(professor => (
             <tr key={professor.id}>
-              <td>{professor.nome}</td>
+              <td>{professor.nomeCompleto}</td>
               <td>{professor.cpf}</td>
               <td>{professor.rg}</td>
               <td>{professor.dataNascimento}</td>
@@ -66,5 +66,5 @@ export default function ProfessoresPage() {
         </tbody>
       </Table>
     </Pagina>
-  )
+  );
 }

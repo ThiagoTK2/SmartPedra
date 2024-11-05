@@ -14,7 +14,7 @@ import TelefoneInput from '@/components/TelefoneInput';
 export default function AlunoFormPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [formasPagamento, setFormasPagamento] = useState([]);
+  const [pagamentos, setPagamentos] = useState([]);
   const [alunos, setAlunos] = useState([]);
   const [alunoEditado, setAlunoEditado] = useState(null);
   const id = searchParams.get('id');
@@ -30,8 +30,8 @@ export default function AlunoFormPage() {
         setAlunoEditado(aluno);
       }
 
-      const formasPagamentoLocal = JSON.parse(localStorage.getItem('formasPagamento')) || [];
-      setFormasPagamento(formasPagamentoLocal);
+      const PagamentosLocal = JSON.parse(localStorage.getItem('pagamentos')) || [];
+      setPagamentos(PagamentosLocal);
     }
   }, [id]);
 
@@ -116,18 +116,18 @@ export default function AlunoFormPage() {
               </Form.Group>
       
                 <Form.Group as={Col}>
-                        <TelefoneInput
-                            {...register("telefone", {
-                            required: "Campo obrigatório",
-                            validate: {
-                            validTelefone: value => validateTelefone(value) || "Telefone inválido"
-                            }
-                            })}
-                            onChange={(e) => setValue("telefone", e.target.value)} // Atualiza o valor do campo
-                            placeholder="(00) 00000-0000"
-                            isInvalid={errors.telefone}
-                            />
-                    <Form.Control.Feedback type='invalid'>{errors.telefone?.message}</Form.Control.Feedback>
+                  <TelefoneInput
+                    {...register("telefone", {
+                        required: "Campo obrigatório",
+                          validate: {
+                          validTelefone: value => validateTelefone(value) || "Telefone inválido"
+                         }
+                       })}
+                       onChange={(e) => setValue("telefone", e.target.value)} // Atualiza o valor do campo
+                       placeholder="(00) 00000-0000"
+                       isInvalid={errors.telefone}
+                   />
+                  <Form.Control.Feedback type='invalid'>{errors.telefone?.message}</Form.Control.Feedback>
                 </Form.Group>
             </Row>
             
@@ -180,14 +180,14 @@ export default function AlunoFormPage() {
 
             <Row className='mb-3'>
               <Form.Group as={Col}>
-                <Form.Label>Forma de Pagamento:</Form.Label>
+                <Form.Label>Status de Pagamento:</Form.Label>
                 <Form.Control
                   {...register("pagamento", { required: "Campo obrigatório" })}
                   as="select"
                   isInvalid={errors.pagamento}
                 >
                   <option value="">Selecione uma forma de pagamento</option>
-                  {formasPagamento.map(pagamento => (
+                  {pagamentos.map(pagamento => (
                     <option key={pagamento.id} value={pagamento.id}>{pagamento.nome}</option>
                   ))}
                 </Form.Control>
@@ -212,3 +212,6 @@ export default function AlunoFormPage() {
     </Pagina>
   );
 }
+
+
+

@@ -6,13 +6,10 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, Card } from 'react-bootstrap';
 import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import CPFInput from '@/components/CPFInput';
 import RGInput from '@/components/RGInput';
 import TelefoneInput from '@/components/TelefoneInput';
-
-
-
 
 export default function ProfessorFormPage() {
   const router = useRouter();
@@ -20,53 +17,54 @@ export default function ProfessorFormPage() {
   const [professores, setProfessores] = useState([]);
   const [professorEditado, setProfessorEditado] = useState(null);
   const id = searchParams.get('id');
+  const [dadosSalvos, setDadosSalvos] = useState(null);
 
-  // useEffect para carregar os professores e o professor a ser editado
   useEffect(() => {
+    // Carrega os professores do localStorage ao carregar a página
     const professoresLocal = JSON.parse(localStorage.getItem('professores')) || [];
     setProfessores(professoresLocal);
-    
+
     if (id) {
       const professorEncontrado = professoresLocal.find(item => item.id === id);
       setProfessorEditado(professorEncontrado);
     }
   }, [id]);
 
-  // Função para salvar o professor
-  function salvar(dados) {
-    if (professorEditado) {
-      Object.assign(professorEditado, dados);
-      localStorage.setItem('professores', JSON.stringify(professores));
-    } else {
-      dados.id = uuidv4();
-      const novosProfessores = [...professores, dados];
-      setProfessores(novosProfessores);
-      localStorage.setItem('professores', JSON.stringify(novosProfessores));
-    }
-
-    alert("Professor cadastrado com sucesso!");
-    router.push("/professores");
-  }
-
-  // Valores iniciais do formulário
-  const initialValues = {
-    nomeCompleto: '',
-    cpf: '',
-    rg: '',
-    dataNascimento: '',
-    telefone: '',
-    especializacao: '',
-    crn: '',
-    email: '',
-  };
-
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: professorEditado || initialValues,
+  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm({
+    defaultValues: professorEditado || {
+      nomeCompleto: '',
+      cpf: '',
+      rg: '',
+      dataNascimento: '',
+      telefone: '',
+      especializacao: '',
+      crn: '',
+      email: '',
+    },
   });
 
+  useEffect(() => {
+    if (professorEditado) {
+      Object.keys(professorEditado).forEach((key) => setValue(key, professorEditado[key]));
+    }
+  }, [professorEditado, setValue]);
+
+  const salvar = (dados) => {
+    const storedProfessores = JSON.parse(localStorage.getItem('professores')) || [];
+    const novaLista = id
+      ? storedProfessores.map(p => p.id === id ? { ...dados, id } : p)
+      : [...storedProfessores, { ...dados, id: uuidv4() }];
+
+    localStorage.setItem('professores', JSON.stringify(novaLista));
+    setDadosSalvos(dados);  // Armazena os dados salvos no estado para exibição
+    alert("Professor cadastrado com sucesso!");
+    router.push("/professores");
+};
+
+
   return (
-    <Pagina titulo={"Cadastro de Professor"}>
-      <Form onSubmit={handleSubmit(salvar)} className="p-3">
+    <Pagina titulo="Cadastro de Professor">
+      <Form onSubmit={handleSubmit} className="p-3">
         <Card className="mb-3">
           <Card.Header as="h4" className="text-center">Dados Pessoais</Card.Header>
           <Card.Body>
@@ -84,34 +82,48 @@ export default function ProfessorFormPage() {
 
             <Row className='mb-3'>
               <Form.Group as={Col}>
-                <CPFInput
-                  {...register("cpf", {
+                <Controller
+                  name="cpf"
+                  control={control}
+                  rules={{
                     required: "Campo obrigatório",
-                    validate: {
-                      validCPF: value => validateCPF(value) || "CPF inválido"
-                    }
-                  })}
-                  onChange={(e) => setValue("cpf", e.target.value)}
-                  isInvalid={errors.cpf}
+                    validate: (value) => validateCPF(value) || "CPF inválido"
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <>
+                      <CPFInput
+                        value={value || ''}
+                        onChange={(e) => onChange(e.target.value)}
+                        isInvalid={!!error}
+                      />
+                      <Form.Control.Feedback type='invalid'>{error?.message}</Form.Control.Feedback>
+                    </>
+                  )}
                 />
-                <Form.Control.Feedback type='invalid'>{errors.cpf?.message}</Form.Control.Feedback>
               </Form.Group>
             </Row>
 
             <Row className='mb-3'>
-                <Form.Group as={Col}>
-                 <RGInput
-                    {...register("rg", {
-                        required: "Campo obrigatório",
-                        validate: {
-                            validRG: value => validateRG(value) || "RG inválido"
-                        }
-                        })}
-                        onChange={(e) => setValue("rg", e.target.value)} // Atualiza o valor do campo
-                        isInvalid={errors.rg}
-                        />
-                        <Form.Control.Feedback type='invalid'>{errors.rg?.message}</Form.Control.Feedback>
-                </Form.Group>
+              <Form.Group as={Col}>
+                <Controller
+                  name="rg"
+                  control={control}
+                  rules={{
+                    required: "Campo obrigatório",
+                    validate: (value) => validateRG(value) || "RG inválido"
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <>
+                      <RGInput
+                        value={value || ''}
+                        onChange={(e) => onChange(e.target.value)}
+                        isInvalid={!!error}
+                      />
+                      <Form.Control.Feedback type='invalid'>{error?.message}</Form.Control.Feedback>
+                    </>
+                  )}
+                />
+              </Form.Group>
             </Row>
 
             <Row className='mb-3'>
@@ -124,20 +136,27 @@ export default function ProfessorFormPage() {
                 />
                 <Form.Control.Feedback type='invalid'>{errors.dataNascimento?.message}</Form.Control.Feedback>
               </Form.Group>
-            <Form.Group as={Col}>
-                    <TelefoneInput
-                        {...register("telefone", {
-                        required: "Campo obrigatório",
-                        valdate: {
-                        validTelefone: value => validateTelefone(value) || "Telefone inválido"
-                        }
-                        })}
-                        onChange={(e) => setValue("telefone", e.target.value)} // Atualiza o valor do campo
+              <Form.Group as={Col}>
+                <Controller
+                  name="telefone"
+                  control={control}
+                  rules={{
+                    required: "Campo obrigatório",
+                    validate: (value) => validateTelefone(value) || "Telefone inválido"
+                  }}
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <>
+                      <TelefoneInput
+                        value={value || ''}
+                        onChange={(e) => onChange(e.target.value)}
                         placeholder="(00) 00000-0000"
-                        isInvalid={errors.telefone}
-                        />
-                <Form.Control.Feedback type='invalid'>{errors.telefone?.message}</Form.Control.Feedback>
-            </Form.Group>
+                        isInvalid={!!error}
+                      />
+                      <Form.Control.Feedback type='invalid'>{error?.message}</Form.Control.Feedback>
+                    </>
+                  )}
+                />
+              </Form.Group>
             </Row>
 
             <Row className='mb-3'>
@@ -161,7 +180,7 @@ export default function ProfessorFormPage() {
               </Form.Group>
             </Row>
 
-            <Row className='mb-3'>
+            <Row className='mb-3'>  
               <Form.Group as={Col}>
                 <Form.Label>Email:</Form.Label>
                 <Form.Control
