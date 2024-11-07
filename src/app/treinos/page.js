@@ -55,10 +55,10 @@ export default function TreinosPage() {
               <td>{treino.nomeProfessor || "Não especificado"}</td>
               <td>{treino.observacoes || "Não especificado"}</td>
               <td className="text-center">
-                <Button className="me-2" href={`/treinos/form?id=${treino.id}`} variant="warning">
+              <Button className="me-2" href={`/treinos/form?id=${treino.id}`} variant="warning">
                   <FaPen />
                 </Button>
-                <Button variant="danger" onClick={() => excluir(treino)}>
+                <Button variant="danger" onClick={() => excluir(avaliacao)}>
                   <FaTrash />
                 </Button>
               </td>

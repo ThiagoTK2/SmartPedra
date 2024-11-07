@@ -4,10 +4,11 @@ import Pagina from '@/components/Pagina';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, Card, Alert } from 'react-bootstrap';
-import { FaArrowLeft, FaCheck, FaTrash, FaPlus } from "react-icons/fa";
+import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
 
 export default function TreinamentoFormPage() {
     const router = useRouter();
@@ -15,49 +16,50 @@ export default function TreinamentoFormPage() {
     const [alunos, setAlunos] = useState([]);
     const [professores, setProfessores] = useState([]);
     const [cpfAluno, setCpfAluno] = useState('');
-    const [dadosSalvos, setDadosSalvos] = useState(null);  // Estado para armazenar os dados salvos
+    const [dadosSalvos, setDadosSalvos] = useState(null);
     const id = searchParams.get('id');
 
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm({
         defaultValues: {
-          nomeAluno: '',
-          cpf: '',
-          nomeProfessor: '',
-          dataInicioPlano: '',
-          dataTerminoPlano: '',
-          objetivoTreinamento: '',
-          treinosPorSemana: '',
-          cargaExercicios: '',
-          observacoes: '',
+            nomeAluno: '',
+            cpf: '',
+            nomeProfessor: '',
+            dataInicioPlano: '',
+            dataTerminoPlano: '',
+            objetivoTreinamento: '',
+            treinosPorSemana: '',
+            cargaExercicios: '',
+            observacoes: '',
         },
-      });
+    });
 
     useEffect(() => {
+        // Ler alunos e professores do localStorage
         const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || [];
         setAlunos(storedAlunos);
-    
+
         const storedProfessores = JSON.parse(localStorage.getItem('professores')) || [];
         setProfessores(storedProfessores);
-    
-        const storedTreinos = JSON.parse(localStorage.getItem('treinos')) || [];
-    
+
+        // Carregar treino se o ID estiver presente
         if (id) {
-          const treinos = storedTreinos.find(item => item.id === id);
-          if (treinos) {
-            reset(treinos);
-            setCpfAluno(treinos.cpf);
-          }
+            const storedTreinos = JSON.parse(localStorage.getItem('treinos')) || [];
+            const treinos = storedTreinos.find(item => item.id === id);
+            if (treinos) {
+                reset(treinos);
+                setCpfAluno(treinos.cpf);
+            }
         }
     }, [id, reset]);
 
     const salvar = (dados) => {
         const storedTreinos = JSON.parse(localStorage.getItem('treinos')) || [];
         const novaLista = id
-          ? storedTreinos.map(t => t.id === id ? { ...dados, id } : t)
-          : [...storedTreinos, { ...dados, id: uuidv4() }];
+            ? storedTreinos.map(t => t.id === id ? { ...dados, id } : t)
+            : [...storedTreinos, { ...dados, id: uuidv4() }];
 
         localStorage.setItem('treinos', JSON.stringify(novaLista));
-        setDadosSalvos(dados);  // Armazena os dados salvos no estado para exibição
+        setDadosSalvos(dados);
         alert("Plano de treinamento cadastrado com sucesso!");
         router.push("/treinos");
     };
@@ -67,6 +69,12 @@ export default function TreinamentoFormPage() {
         setValue("nomeAluno", e.target.value);
         setCpfAluno(selectedAluno ? selectedAluno.cpf : '');
         setValue("cpf", selectedAluno ? selectedAluno.cpf : '');
+    };
+
+    const handleProfessorChange = (e) => {
+        const selectedProfessor = professores.find(professor => professor.nomeCompleto === e.target.value);
+        setValue("nomeProfessor", e.target.value);
+        setValue("cpf", selectedProfessor ? selectedProfessor.cpf : '');
     };
 
     return (
@@ -112,11 +120,12 @@ export default function TreinamentoFormPage() {
                                 <Form.Control
                                     as="select"
                                     {...register("nomeProfessor", { required: "Campo obrigatório" })}
+                                    onChange={handleProfessorChange}
                                     isInvalid={errors.nomeProfessor}
                                 >
                                     <option value="">Selecione o professor</option>
                                     {professores.map(professor => (
-                                        <option key={professor.id} value={professor.nome}>{professor.nome}</option>
+                                        <option key={professor.id} value={professor.nomeCompleto}>{professor.nomeCompleto}</option>
                                     ))}
                                 </Form.Control>
                                 <Form.Control.Feedback type='invalid'>{errors.nomeProfessor?.message}</Form.Control.Feedback>
@@ -161,22 +170,54 @@ export default function TreinamentoFormPage() {
                         <Row className='mb-3'>
                             <Form.Group as={Col}>
                                 <Form.Label>Treinos por Semana:</Form.Label>
-                                <Form.Control
-                                    {...register("treinosPorSemana", { required: "Campo obrigatório" })}
-                                    type='number'
-                                    isInvalid={errors.treinosPorSemana}
-                                />
-                                <Form.Control.Feedback type='invalid'>{errors.treinosPorSemana?.message}</Form.Control.Feedback>
+                                <InputMask 
+                                    mask="9"
+                                    maskChar={null}
+                                    {...register("treinosPorSemana", { 
+                                        required: "Campo obrigatório", 
+                                        validate: (value) => 
+                                            (value >= 1 && value <= 7) || "Digite um número entre 1 e 7"
+                                    })}
+                                >
+                                    {(inputProps) => (
+                                        <Form.Control 
+                                            {...inputProps}
+                                            type="text"
+                                            isInvalid={errors.treinosPorSemana}
+                                            placeholder="1-7"
+                                        />
+                                    )}
+                                </InputMask>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.treinosPorSemana?.message}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
                             <Form.Group as={Col}>
                                 <Form.Label>Carga de Exercícios (kg):</Form.Label>
-                                <Form.Control
-                                    {...register("cargaExercicios", { required: "Campo obrigatório" })}
-                                    type='number'
-                                    isInvalid={errors.cargaExercicios}
-                                />
-                                <Form.Control.Feedback type='invalid'>{errors.cargaExercicios?.message}</Form.Control.Feedback>
+                                <InputMask
+                                    mask="999.9"
+                                    maskChar={null}
+                                    {...register("cargaExercicios", { 
+                                        required: "Campo obrigatório",
+                                        pattern: {
+                                            value: /^\d{1,3}(\.\d)?$/,
+                                            message: "Formato inválido. Use até 3 dígitos e um decimal opcional"
+                                        }
+                                    })}
+                                >
+                                    {(inputProps) => (
+                                        <Form.Control
+                                            {...inputProps}
+                                            type="text"
+                                            isInvalid={errors.cargaExercicios}
+                                            placeholder="Ex: 100.5"
+                                        />
+                                    )}
+                                </InputMask>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.cargaExercicios?.message}
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Row>
 

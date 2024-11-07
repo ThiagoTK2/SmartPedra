@@ -6,21 +6,21 @@ export default function Pagina({ titulo, children }) {
   return (
     <>
       {/* Barra de Navegação */}
-      <Navbar bg="dark" variant="dark">
+      <Navbar style={{ backgroundColor: 'orange' }} variant="dark">
         <Container>
-          <Navbar.Brand href="/">Home</Navbar.Brand>
+          <Navbar.Brand href="/" style={{ color: 'black' }}>Home</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/alunos">Alunos</Nav.Link>
-            <Nav.Link href="/professores">Professores</Nav.Link>
-            <Nav.Link href="/treinos">Treinos</Nav.Link>
-            <Nav.Link href="/avaliacoes">Avaliações</Nav.Link>
-            <Nav.Link href="/pagamentos">Pagamentos</Nav.Link>
+            <Nav.Link href="/alunos" style={{ color: 'black' }}>Alunos</Nav.Link>
+            <Nav.Link href="/professores" style={{ color: 'black' }}>Professores</Nav.Link>
+            <Nav.Link href="/treinos" style={{ color: 'black' }}>Treinos</Nav.Link>
+            <Nav.Link href="/avaliacoes" style={{ color: 'black' }}>Avaliações</Nav.Link>
+            <Nav.Link href="/pagamentos" style={{ color: 'black' }}>Pagamentos</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
 
       {/* Barra de Titulo */}
-      <div className="bg-secondary text-center text-white py-2">
+      <div className="bg-dark text-center text-white py-2">
         <h1>{titulo}</h1>
       </div>
 

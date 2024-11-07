@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 
 import Pagina from '@/components/Pagina';
 import { useRouter } from 'next/navigation';
@@ -8,11 +8,13 @@ import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
 
 export default function PagamentoFormPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [dadosSalvos, setDadosSalvos] = useState(null);
+    const [alunos, setAlunos] = useState([]); // Estado para armazenar alunos
     const id = searchParams.get('id');
 
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm({
@@ -29,8 +31,11 @@ export default function PagamentoFormPage() {
     });
 
     useEffect(() => {
-        const storedPagamentos = JSON.parse(localStorage.getItem('pagamentos')) || [];
+        // Carregar alunos do localStorage
+        const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || [];
+        setAlunos(storedAlunos);
 
+        const storedPagamentos = JSON.parse(localStorage.getItem('pagamentos')) || [];
         if (id) {
             const pagamento = storedPagamentos.find(item => item.id === id);
             if (pagamento) {
@@ -75,10 +80,17 @@ export default function PagamentoFormPage() {
                             <Form.Group as={Col}>
                                 <Form.Label>Nome do Aluno:</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    as="select"
                                     {...register("nomeAluno", { required: "Campo obrigatório" })}
                                     isInvalid={errors.nomeAluno}
-                                />
+                                >
+                                    <option value="">Selecione um aluno</option>
+                                    {alunos.map(aluno => (
+                                        <option key={aluno.id} value={aluno.nomeCompleto}>
+                                            {aluno.nomeCompleto}
+                                        </option>
+                                    ))}
+                                </Form.Control>
                                 <Form.Control.Feedback type='invalid'>{errors.nomeAluno?.message}</Form.Control.Feedback>
                             </Form.Group>
                         </Row>
@@ -96,13 +108,29 @@ export default function PagamentoFormPage() {
 
                             <Form.Group as={Col}>
                                 <Form.Label>Valor Pago (R$):</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    step="0.01"
-                                    {...register("valorPago", { required: "Campo obrigatório" })}
-                                    isInvalid={errors.valorPago}
-                                />
-                                <Form.Control.Feedback type='invalid'>{errors.valorPago?.message}</Form.Control.Feedback>
+                                <InputMask
+                                    mask="R$ 999,99"
+                                    maskChar={null}
+                                    {...register("valorPago", { 
+                                        required: "Campo obrigatório",
+                                        pattern: {
+                                            value: /^\d{1,3}(\.,\d{2})?$/,
+                                            message: "Formato inválido. Ex: R$ 123,45"
+                                        }
+                                    })}
+                                >
+                                    {(inputProps) => (
+                                        <Form.Control
+                                            {...inputProps}
+                                            type="text"
+                                            isInvalid={errors.valorPago}
+                                            placeholder="Ex: R$ 200,00"
+                                        />
+                                    )}
+                                </InputMask>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.valorPago?.message}
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Row>
 

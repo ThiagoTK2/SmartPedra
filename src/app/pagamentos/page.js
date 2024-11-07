@@ -4,7 +4,7 @@ import Pagina from '@/components/Pagina';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button, Table, Card } from 'react-bootstrap';
-import { FaPlus, FaEye } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
 export default function PagamentosPage() {
     const router = useRouter();
@@ -19,8 +19,16 @@ export default function PagamentosPage() {
         router.push("/pagamentos/form");
     };
 
-    const visualizarPagamento = (id) => {
-        router.push(`/pagamentos/${id}`);
+    const editarPagamento = (id) => {
+        router.push(`/pagamentos/form?id=${id}`);
+    };
+
+    const excluirPagamento = (id) => {
+        if (confirm("Tem certeza que deseja excluir este pagamento?")) {
+            const updatedPagamentos = pagamentos.filter(pagamento => pagamento.id !== id);
+            setPagamentos(updatedPagamentos);
+            localStorage.setItem('pagamentos', JSON.stringify(updatedPagamentos));
+        }
     };
 
     return (
@@ -56,10 +64,17 @@ export default function PagamentosPage() {
                                         <td>{pagamento.statusPagamento}</td>
                                         <td>
                                             <Button
-                                                variant="secondary"
-                                                onClick={() => visualizarPagamento(pagamento.id)}
+                                                variant="warning"
+                                                onClick={() => editarPagamento(pagamento.id)}
+                                                className="me-2"
                                             >
-                                                <FaEye /> Visualizar
+                                                <FaEdit /> Editar
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => excluirPagamento(pagamento.id)}
+                                            >
+                                                <FaTrash /> Excluir
                                             </Button>
                                         </td>
                                     </tr>

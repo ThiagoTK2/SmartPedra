@@ -51,8 +51,8 @@ export default function AvaliacoesPage() {
               <td>{avaliacao.peso}</td>
               <td>{avaliacao.percentualGordura}</td>
               <td>{avaliacao.imc}</td>
-              <td>{avaliacao.circAbdominal}</td>
-              <td>{avaliacao.resultadosObservacoes}</td>
+              <td>{avaliacao.circunferenciaAbdominal}</td>
+              <td>{avaliacao.observacoes}</td>
               <td className="text-center">
                 <Button className="me-2" href={`/avaliacoes/form?id=${avaliacao.id}`} variant="warning">
                   <FaPen />
