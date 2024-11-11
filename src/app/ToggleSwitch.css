@@ -1,0 +1,49 @@
+/* Estilos para a posição do botão de alternância */
+.new-toggle-container {
+    position: absolute;
+    top: 80px; /* Ajuste conforme necessário para descer mais */
+    right: 20px; /* Ajuste conforme necessário */
+    z-index: 10;
+  }
+  
+  /* Estilos do Toggle Switch (sem alteração) */
+  .new-toggle-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 3em;
+    height: 1.5em;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 0.75em;
+    box-shadow: inset 0.125em 0.125em 0 0.125em rgba(0, 0, 0, 0.3);
+    transition: background-color 0.1s 0.3s ease-out, box-shadow 0.1s 0.3s ease-out;
+    cursor: pointer;
+  }
+  
+  /* Ocultar o checkbox padrão */
+  .new-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* Círculo dentro do toggle */
+  .new-toggle-switch .new-slider:before {
+    content: "";
+    position: absolute;
+    background-color: #d7d7d7;
+    border-radius: 50%;
+    width: 1.2em;
+    height: 1.2em;
+    left: 0.15em;
+    top: 0.15em;
+    transition: background-color 0.1s 0.3s ease-out, transform 0.3s ease-out;
+    z-index: 1;
+    box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.2);
+  }
+  
+  .new-toggle-switch input:checked + .new-slider:before {
+    transform: translateX(1.5em);
+    background-color: #fdea7b;
+  }
+  

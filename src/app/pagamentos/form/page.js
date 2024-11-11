@@ -107,30 +107,30 @@ export default function PagamentoFormPage() {
                             </Form.Group>
 
                             <Form.Group as={Col}>
-                                <Form.Label>Valor Pago (R$):</Form.Label>
+                            <Form.Label>Valor Pago (R$):</Form.Label>
                                 <InputMask
                                     mask="R$ 999,99"
-                                    maskChar={null}
-                                    {...register("valorPago", { 
-                                        required: "Campo obrigatório",
-                                        pattern: {
-                                            value: /^\d{1,3}(\.,\d{2})?$/,
-                                            message: "Formato inválido. Ex: R$ 123,45"
-                                        }
-                                    })}
-                                >
+                                    maskChar=""
+                                {...register("valorPago", {
+                                    required: "Campo obrigatório",
+                                    pattern: {
+                                        value: /^R\$\s\d{1,3},\d{2}$/,
+                                        message: "Formato inválido. Ex: R$ 123,45"
+                                }
+                              })}
+                                  >
                                     {(inputProps) => (
-                                        <Form.Control
-                                            {...inputProps}
-                                            type="text"
-                                            isInvalid={errors.valorPago}
-                                            placeholder="Ex: R$ 200,00"
-                                        />
-                                    )}
+                                <Form.Control
+                                    {...inputProps}
+                                        type="text"
+                                        isInvalid={!!errors.valorPago}
+                                        placeholder="Ex: R$ 200,00"
+                                />
+                                   )}
                                 </InputMask>
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.valorPago?.message}
-                                </Form.Control.Feedback>
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.valorPago?.message}
+                                    </Form.Control.Feedback>
                             </Form.Group>
                         </Row>
 

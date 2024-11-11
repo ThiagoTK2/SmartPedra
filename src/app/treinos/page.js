@@ -4,6 +4,7 @@ import Pagina from '@/components/Pagina';
 import { useEffect, useState } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import { FaPen, FaPlusCircle, FaTrash } from 'react-icons/fa';
+import "../page.module.css"
 
 export default function TreinosPage() {
   const [treinos, setTreinos] = useState([]);
