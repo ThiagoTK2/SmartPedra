@@ -137,7 +137,11 @@ const Relatorio = () => {
     const doc = new jsPDF();
     doc.text('Relatório de Alunos, Avaliações e Pagamentos', 14, 20);
 
-    const alunosFormatados = dados.alunos.map(({ nome, idade }) => [nome, idade]);
+    // Formatar os dados dos alunos para exibir no PDF
+    const alunosFormatados = dados.alunos.map(aluno => [
+      aluno.nome || 'Nome não disponível', 
+      aluno.idade || 'Idade não disponível'
+    ]);
     doc.autoTable({
       head: [['Nome do Aluno', 'Idade']],
       body: alunosFormatados,
@@ -149,9 +153,11 @@ const Relatorio = () => {
 
     graficos.forEach((grafico, index) => {
       const canvas = document.getElementById(`grafico${grafico}`);
-      const imgData = canvas.toDataURL('image/png');
-      doc.addImage(imgData, 'PNG', index % 2 === 0 ? 15 : 105, posicaoY, 90, 60);
-      if (index % 2 === 1) posicaoY += 70;
+      if (canvas) {
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', index % 2 === 0 ? 15 : 105, posicaoY, 90, 60);
+        if (index % 2 === 1) posicaoY += 70;
+      }
     });
 
     doc.save('relatorio_alunos_avaliacoes_pagamentos.pdf');

@@ -8,11 +8,10 @@ import { FaPen, FaPlusCircle, FaTrash } from 'react-icons/fa';
 export default function AlunosPage() {
   const [alunos, setAlunos] = useState([]);
 
-  useEffect(() => {
-    // Carrega os alunos do localStorage quando a página é carregada
-    const alunosLocalStorage = JSON.parse(localStorage.getItem("alunos")) || [];
-    setAlunos(alunosLocalStorage);
-  }, []);
+  useEffect(() => { // Hook de efeito, executado ao carregar o componente.
+    const alunosLocalStorage = JSON.parse(localStorage.getItem("alunos")) || []; // Obtém lista de alunos do localStorage, ou cria uma lista vazia.
+    setAlunos(alunosLocalStorage); // Atualiza o estado com os dados do localStorage.
+}, []); // Dependência vazia, então executa apenas uma vez após o carregamento.
 
   function excluir(aluno) {
     if (window.confirm(`Deseja realmente excluir o cadastro do aluno ${aluno.nomeCompleto}?`)) {

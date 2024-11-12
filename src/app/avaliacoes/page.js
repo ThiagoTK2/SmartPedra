@@ -8,10 +8,10 @@ import { FaPen, FaPlusCircle, FaTrash } from 'react-icons/fa';
 export default function AvaliacoesPage() {
   const [avaliacoes, setAvaliacoes] = useState([]);
 
-  useEffect(() => {
-    const storedAvaliacoes = JSON.parse(localStorage.getItem('avaliacoes')) || [];
-    setAvaliacoes(storedAvaliacoes);
-  }, []);
+  useEffect(() => { // Hook de efeito, executado ao carregar o componente.
+    const avaliacoesLocalStorage = JSON.parse(localStorage.getItem("avaliacoes")) || []; // Obtém lista de avaliações do localStorage, ou cria uma lista vazia.
+    setAvaliacoes(avaliacoesLocalStorage); // Atualiza o estado com os dados do localStorage.
+}, []); // Dependência vazia, então executa apenas uma vez após o carregamento.
 
   function excluir(avaliacao) {
     if (window.confirm(`Deseja realmente excluir a avaliação de ${avaliacao.nomeAluno}?`)) {

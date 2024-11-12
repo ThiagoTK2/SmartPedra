@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, Card } from 'react-bootstrap';
 import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
+import { useSearchParams } from 'next/navigation'; // Importa função para acessar parâmetros de busca da URL.
 import { useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 
@@ -13,6 +14,8 @@ export default function CadastroAlunoPage() {
   const [isClient, setIsClient] = useState(false);  // Estado para verificar se é o lado cliente
   const [aluno, setAluno] = useState(null);  // Estado para armazenar os dados do aluno
   const router = useRouter();
+  const searchParams = useSearchParams(); // Hook para obter parâmetros de busca na URL.
+  const id = searchParams.get('id'); // Pega o parâmetro "id" da URL.
   const params = useParams(); // Obtenha o parâmetro id da URL
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -34,33 +37,25 @@ export default function CadastroAlunoPage() {
 
   // Carregar os dados do aluno para editar
   useEffect(() => {
-    if (isClient && params.id) {
-      const alunos = JSON.parse(localStorage.getItem('alunos')) || [];
-      const alunoEncontrado = alunos.find(a => a.id === params.id);
-
-      if (alunoEncontrado) {
-        setAluno(alunoEncontrado);
-        reset(alunoEncontrado);  // Preenche o formulário com os dados do aluno
-      }
+    const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || []; // Obtém lista de alunos do localStorage.
+    if (id) { // Se o "id" existe, indica uma edição de cadastro.
+        const aluno = storedAlunos.find(item => item.id === id); // Busca o aluno correspondente ao id.
+        if (aluno) {
+            reset(aluno); // Preenche o formulário com os dados do aluno encontrado.
+        }
     }
-  }, [isClient, params.id, reset]);
+}, [id, reset]);
 
   const salvar = (dados) => {
-    const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || [];
-    let novaLista;
+    const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || []; // Carrega os alunos existentes.
+    const novaLista = dados.id
+        ? storedAlunos.map(a => a.id === dados.id ? { ...dados } : a) // Atualiza o aluno existente.
+        : [...storedAlunos, { ...dados, id: uuidv4() }]; // Adiciona um novo aluno com ID único.
 
-    if (aluno) {
-      // Se já houver aluno, atualiza os dados
-      novaLista = storedAlunos.map(a => a.id === aluno.id ? { ...dados, id: aluno.id } : a);
-    } else {
-      // Caso contrário, cria um novo aluno
-      novaLista = [...storedAlunos, { ...dados, id: uuidv4() }];
-    }
-
-    localStorage.setItem('alunos', JSON.stringify(novaLista));
-    alert(aluno ? "Aluno editado com sucesso!" : "Aluno cadastrado com sucesso!");
-    router.push("/alunos");
-  };
+    localStorage.setItem('alunos', JSON.stringify(novaLista)); // Salva a lista atualizada no localStorage.
+    alert("Aluno cadastrado com sucesso!"); // Mensagem de sucesso para o usuário.
+    router.push("/alunos"); // Redireciona para a página de alunos.
+};
 
   if (!isClient) {
     return null;  // Não renderiza nada enquanto estamos no lado do servidor

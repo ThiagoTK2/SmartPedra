@@ -6,39 +6,52 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, Card, Alert } from 'react-bootstrap';
 import { FaArrowLeft, FaCheck, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from 'uuid';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 
 export default function AvaliacaoFormPage() {
     const router = useRouter();
-    const [alunos, setAlunos] = useState([]);
+    const [alunos, setAlunos] = useState([]); // Estado para armazenar os alunos
     const [dadosSalvos, setDadosSalvos] = useState(null);
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
 
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm({
         defaultValues: {
-          nomeAluno: '',
-          dataAvaliacao: '',
-          altura: '',
-          peso: '',
-          percentualGordura: '',
-          circunferenciaAbdominal: '',
-          imc: '',
-          observacoes: '',
+            nomeAluno: '',
+            dataAvaliacao: '',
+            altura: '',
+            peso: '',
+            percentualGordura: '',
+            circunferenciaAbdominal: '',
+            imc: '',
+            observacoes: '',
         },
     });
 
     useEffect(() => {
         // Carregar alunos do localStorage
         const storedAlunos = JSON.parse(localStorage.getItem('alunos')) || [];
-        setAlunos(storedAlunos);
-    }, []);
+        setAlunos(storedAlunos); // Atualiza o estado com a lista de alunos
 
-    const salvar = (dados) => {
+        // Carregar avaliações para edição se o "id" existir
         const storedAvaliacoes = JSON.parse(localStorage.getItem('avaliacoes')) || [];
-        const novaLista = [...storedAvaliacoes, { ...dados, id: uuidv4() }];
+        if (id) {
+            const avaliacao = storedAvaliacoes.find(item => item.id === id);
+            if (avaliacao) {
+                reset(avaliacao);
+            }
+        }
+    }, [id, reset]);
+
+    const salvar = (dados) => { 
+        const storedAvaliacoes = JSON.parse(localStorage.getItem('avaliacoes')) || [];
+        const novaLista = dados.id
+            ? storedAvaliacoes.map(a => a.id === dados.id ? { ...dados, id: dados.id } : a)
+            : [...storedAvaliacoes, { ...dados, id: uuidv4() }];
 
         localStorage.setItem('avaliacoes', JSON.stringify(novaLista));
-        setDadosSalvos(dados);
         alert("Avaliação cadastrada com sucesso!");
         router.push("/avaliacoes");
     };
@@ -108,7 +121,7 @@ export default function AvaliacaoFormPage() {
                                 <InputMask
                                     mask="999.9"
                                     maskChar={null}
-                                    {...register("cargaExercicios", { 
+                                    {...register("peso", { 
                                         required: "Campo obrigatório",
                                         pattern: {
                                             value: /^\d{1,3}(\.\d)?$/,
@@ -120,13 +133,13 @@ export default function AvaliacaoFormPage() {
                                         <Form.Control
                                             {...inputProps}
                                             type="text"
-                                            isInvalid={errors.cargaExercicios}
+                                            isInvalid={errors.peso}
                                             placeholder="Ex: 90kg"
                                         />
                                     )}
                                 </InputMask>
                                 <Form.Control.Feedback type="invalid">
-                                    {errors.cargaExercicios?.message}
+                                    {errors.peso?.message}
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Row>
