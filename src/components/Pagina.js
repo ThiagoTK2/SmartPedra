@@ -15,6 +15,7 @@ export default function Pagina({ titulo, children }) {
             <Nav.Link href="/treinos" style={{ color: 'black' }}>Treinos</Nav.Link>
             <Nav.Link href="/avaliacoes" style={{ color: 'black' }}>Avaliações</Nav.Link>
             <Nav.Link href="/pagamentos" style={{ color: 'black' }}>Pagamentos</Nav.Link>
+            <Nav.Link href="/relatorio" style={{ color: 'black' }}>Relatorio</Nav.Link>
           </Nav>
         </Container>
       </Navbar>

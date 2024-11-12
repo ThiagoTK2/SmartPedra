@@ -10,7 +10,6 @@ export default function HomePage() {
   const [treinos, setTreinos] = useState([]);
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [pagamentos, setPagamentos] = useState([]);
-  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -19,7 +18,6 @@ export default function HomePage() {
       setTreinos(JSON.parse(localStorage.getItem("treinos")) || []);
       setAvaliacoes(JSON.parse(localStorage.getItem("avaliacoes")) || []);
       setPagamentos(JSON.parse(localStorage.getItem("pagamentos")) || []);
-      
     }
   }, []);
 
@@ -49,21 +47,38 @@ export default function HomePage() {
       imagem: "/img/Pagamento.png", quantidade: pagamentos.length,
       link: "/pagamentos"
     },
+    {
+      nome: "Relatorio",
+      imagem: "/img/Desempenho.png", quantidade: pagamentos.length,
+      link: "/relatorio"
+    },
   ];
 
   return (
     <Pagina titulo={"SmartPedra"}>
-      <Row md={4}>
+      <Row md={3} className="g-4">
         {lista.map((item, index) => (
-          <Col className='py-2' key={index}>
-            <Card style={{ height: '100%' }}>
-              <Card.Img src={item.imagem} style={{ height: '100%' }} />
-              <Card.Body>
-                <Card.Title>{item.nome}</Card.Title>
-                Cadastrados: {item.quantidade}
+          <Col key={index}>
+            <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+              <Card.Img 
+                src={item.imagem} 
+                style={{ height: '200px', objectFit: 'cover' }} 
+                alt={`Imagem de ${item.nome}`} 
+              />
+              <Card.Body className="text-center">
+                <Card.Title className="fs-4 fw-bold">{item.nome}</Card.Title>
+                <Card.Text className="text-muted">
+                  Cadastrados: <span className="fw-semibold">{item.quantidade}</span>
+                </Card.Text>
               </Card.Body>
-              <Card.Footer className='bg-dark text-end'>
-                <Button href={item.link}>Ver Lista</Button>
+              <Card.Footer className="bg-transparent border-0 text-center pb-3">
+                <Button 
+                  href={item.link} 
+                  variant="outline-dark" 
+                  className="rounded-pill px-4 py-2 shadow-sm"
+                >
+                  Ver Lista
+                </Button>
               </Card.Footer>
             </Card>
           </Col>
