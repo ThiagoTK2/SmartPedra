@@ -1,3 +1,4 @@
+// Ativa o modo client-side do Next.js
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -46,88 +47,27 @@ const Relatorio = () => {
 
   const configurarGraficos = useCallback(() => {
     const configuracoes = [
-      {
-        label: 'Alunos',
-        data: [dados.alunos.length],
-        color: '#4caf50',
-        refIndex: 0,
-        title: 'Total de Alunos',
-        axisLabels: ['Alunos'],
-      },
-      {
-        label: 'Avaliações',
-        data: [dados.avaliacoes.length],
-        color: '#2196f3',
-        refIndex: 1,
-        title: 'Total de Avaliações',
-        axisLabels: ['Avaliações'],
-      },
-      {
-        label: 'Pagamentos',
-        data: [dados.pagamentos.length],
-        color: '#ff9800',
-        refIndex: 2,
-        title: 'Total de Pagamentos',
-        axisLabels: ['Pagamentos'],
-      },
+      { label: 'Alunos', data: [dados.alunos.length], color: '#4caf50', refIndex: 0, title: 'Total de Alunos' },
+      { label: 'Avaliações', data: [dados.avaliacoes.length], color: '#2196f3', refIndex: 1, title: 'Total de Avaliações' },
+      { label: 'Pagamentos', data: [dados.pagamentos.length], color: '#ff9800', refIndex: 2, title: 'Total de Pagamentos' },
     ];
 
-    configuracoes.forEach(({ label, data, color, refIndex, title, axisLabels }) => {
+    configuracoes.forEach(({ label, data, color, refIndex, title }) => {
       const ctx = document.getElementById(`grafico${label}`).getContext('2d');
       if (graficoRefs.current[refIndex]) graficoRefs.current[refIndex].destroy();
 
       graficoRefs.current[refIndex] = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: axisLabels,
+          labels: [title],
           datasets: [
-            {
-              label: `Quantidade de ${label}`,
-              data,
-              backgroundColor: color,
-              borderColor: color,
-              borderWidth: 1,
-              hoverBackgroundColor: `${color}aa`,
-              hoverBorderColor: `${color}cc`,
-            },
+            { label: `Quantidade de ${label}`, data, backgroundColor: color, borderColor: color },
           ],
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            title: {
-              display: true,
-              text: title,
-              font: {
-                size: 16,
-                weight: 'bold',
-              },
-            },
-            tooltip: {
-              callbacks: {
-                label: context => `${context.dataset.label}: ${context.raw}`,
-              },
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1,
-              },
-              title: {
-                display: true,
-                text: 'Quantidade',
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: title,
-              },
-            },
-          },
+          plugins: { title: { display: true, text: title, font: { size: 16, weight: 'bold' } } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
         },
       });
     });
@@ -137,30 +77,30 @@ const Relatorio = () => {
     const doc = new jsPDF();
     doc.text('Relatório de Alunos, Avaliações e Pagamentos', 14, 20);
 
-    // Formatar os dados dos alunos para exibir no PDF
-    const alunosFormatados = dados.alunos.map(aluno => [
-      aluno.nome || 'Nome não disponível', 
-      aluno.idade || 'Idade não disponível'
-    ]);
+    // Tabela de resumo com os totais
     doc.autoTable({
-      head: [['Nome do Aluno', 'Idade']],
-      body: alunosFormatados,
+      head: [['Categoria', 'Quantidade']],
+      body: [
+        ['Total de Alunos', dados.alunos.length],
+        ['Total de Avaliações', dados.avaliacoes.length],
+        ['Total de Pagamentos', dados.pagamentos.length],
+      ],
       startY: 30,
     });
 
+    // Adiciona os gráficos
     const graficos = ['Alunos', 'Avaliações', 'Pagamentos'];
     let posicaoY = doc.autoTable.previous.finalY + 10;
-
     graficos.forEach((grafico, index) => {
       const canvas = document.getElementById(`grafico${grafico}`);
       if (canvas) {
         const imgData = canvas.toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', index % 2 === 0 ? 15 : 105, posicaoY, 90, 60);
-        if (index % 2 === 1) posicaoY += 70;
+        doc.addImage(imgData, 'PNG', 15, posicaoY, 90, 60);
+        posicaoY += 70;
       }
     });
 
-    doc.save('relatorio_alunos_avaliacoes_pagamentos.pdf');
+    doc.save('relatorio_total_alunos_avaliacoes_pagamentos.pdf');
   }, [dados]);
 
   return (
@@ -178,10 +118,7 @@ const Relatorio = () => {
         ))}
       </div>
       <div className="text-center">
-        <button
-          className="btn btn-success btn-lg"
-          onClick={exportarPDF}
-        >
+        <button className="btn btn-success btn-lg" onClick={exportarPDF}>
           Exportar PDF
         </button>
       </div>
